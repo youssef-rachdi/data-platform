@@ -16,6 +16,7 @@ class Settings:
     env: str
     log_level: str
     log_dir: Path
+    data_dir: Path
 
 
 def load_settings() -> Settings:
@@ -25,6 +26,7 @@ def load_settings() -> Settings:
     env = os.getenv("APP_ENV", "development")
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     log_dir = Path(os.getenv("LOG_DIR", "logs"))
+    data_dir = Path(os.getenv("DATA_DIR", "data"))
 
     if log_level not in VALID_LOG_LEVELS:
         raise ValueError(
@@ -32,4 +34,4 @@ def load_settings() -> Settings:
             f"Expected one of: {sorted(VALID_LOG_LEVELS)}"
         )
 
-    return Settings(env=env, log_level=log_level, log_dir=log_dir)
+    return Settings(env=env, log_level=log_level, log_dir=log_dir, data_dir=data_dir)
