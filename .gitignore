@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Test and tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Secrets and local configuration
+.env
+
+# Logs
+*.log
+logs/
+
+# Local data (never commit data files)
+data/
+
+# IDE
+.idea/
+.vscode/
