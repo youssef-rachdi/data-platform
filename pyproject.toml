@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "End-to-end Data Engineering platform"
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
