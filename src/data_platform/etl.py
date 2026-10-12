@@ -1,9 +1,13 @@
-"""A small ETL pipeline: orders CSV -> cleaned Parquet."""
+"""ETL pipeline: orders CSV -> cleaned Parquet and PostgreSQL."""
 
 import logging
 from pathlib import Path
 
 import pandas as pd
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.engine import Engine
+
+from data_platform.database import orders_table
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +59,38 @@ def load(df: pd.DataFrame, path: Path) -> None:
     logger.info("Loaded %d rows to %s", len(df), path)
 
 
-def run_pipeline(input_path: Path, output_path: Path) -> int:
+def load_to_database(df: pd.DataFrame, engine: Engine) -> None:
+    """Upsert the cleaned orders into PostgreSQL (safe to run repeatedly)."""
+    if df.empty:
+        logger.warning("No rows to load into the database")
+        return
+
+    records = df.assign(order_date=df["order_date"].dt.date).to_dict(
+        orient="records"
+    )
+
+    statement = insert(orders_table)
+    statement = statement.on_conflict_do_update(
+        index_elements=[orders_table.c.order_id],
+        set_={
+            column.name: statement.excluded[column.name]
+            for column in orders_table.columns
+            if not column.primary_key
+        },
+    )
+
+    with engine.begin() as connection:
+        connection.execute(statement, records)
+    logger.info("Upserted %d rows into table %s", len(records), orders_table.name)
+
+
+def run_pipeline(
+    input_path: Path, output_path: Path, engine: Engine | None = None
+) -> int:
     """Run extract, transform and load. Return the number of rows loaded."""
     raw = extract(input_path)
     clean = transform(raw)
     load(clean, output_path)
+    if engine is not None:
+        load_to_database(clean, engine)
     return len(clean)
