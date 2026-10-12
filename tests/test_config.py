@@ -12,14 +12,14 @@ def isolate_environment(monkeypatch):
     monkeypatch.setattr(
         "data_platform.config.load_dotenv", lambda *args, **kwargs: None
     )
-    for name in ("APP_ENV", "LOG_LEVEL", "LOG_DIR"):
+    for name in ("APP_ENV", "LOG_LEVEL", "LOG_DIR", "DATA_DIR"):
         monkeypatch.delenv(name, raising=False)
 
 
 def test_defaults_when_nothing_is_set():
     settings = load_settings()
     assert settings == Settings(
-        env="development", log_level="INFO", log_dir=Path("logs")
+        env="development", log_level="INFO", log_dir=Path("logs"), data_dir=Path("data"),
     )
 
 
