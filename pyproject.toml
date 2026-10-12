@@ -11,7 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
     "python-dotenv>=1.0",
     "pandas>=2.2,<3",
-    "pyarrow>=15.0",
+    "pyarrow>=15.0,<22",
     "sqlalchemy>=2.0",
     "psycopg2-binary>=2.9",
 ]
